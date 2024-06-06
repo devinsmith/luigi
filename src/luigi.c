@@ -121,11 +121,6 @@ const uint64_t _uiFont[] = {
 	0x1800181818180000UL, 0x0000000018181818UL, 0x18701818180E0000UL, 0x000000000E181818UL, 0x000000003B6E0000UL, 0x0000000000000000UL, 0x63361C0800000000UL, 0x00000000007F6363UL, 
 };
 
-
-#ifdef UI_WINDOWS
-void *_UIHeapReAlloc(void *pointer, size_t size);
-#endif
-
 UIRectangle UIRectangleIntersection(UIRectangle a, UIRectangle b) {
 	if (a.l < b.l) a.l = b.l;
 	if (a.t < b.t) a.t = b.t;

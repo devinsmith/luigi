@@ -35,6 +35,7 @@
 void UIAssert(const char *exp, const char *filename, unsigned int line)
 {
 #if defined(WIN32)
+#if 0
   LPCSTR assertMsg;
 
   LPCSTR args[3];
@@ -50,9 +51,11 @@ void UIAssert(const char *exp, const char *filename, unsigned int line)
       (LPSTR)&assertMsg,
       0, // No minimum size
       (va_list*)args);
+#endif
 
   ui.assertionFailure = true;
-  MessageBox(0, assertMsg, 0, 0);
+//  MessageBox(0, assertMsg, 0, 0);
+  MessageBox(0, "UIAssert failed", 0, 0);
   ExitProcess(1);
 #else
   if (isatty(fileno(stderr))) {

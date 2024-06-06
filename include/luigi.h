@@ -36,9 +36,6 @@
 #include <stdbool.h>
 #include <stdarg.h>
 
-#ifdef UI_LINUX
-#endif
-
 #define _UI_TO_STRING_1(x) #x
 #define _UI_TO_STRING_2(x) _UI_TO_STRING_1(x)
 
@@ -50,7 +47,6 @@
 #define __likely(cond)    (!!(cond))
 #define __unlikely(cond)  (!!(cond))
 #endif
-
 
 #ifndef NDEBUG
 #define UI_ASSERT(exp) (__likely(exp)?((void)0):(void)UIAssert(#exp,__FILE__,__LINE__))

@@ -81,6 +81,10 @@ extern struct ui_ctx ui;
 UIWindow *X11FindWindow(Window window);
 #endif
 
+#ifdef UI_WINDOWS
+void *_UIHeapReAlloc(void *pointer, size_t size);
+#endif
+
 void _UIWindowEndPaint(UIWindow *window, UIPainter *painter);
 void _UIWindowSetCursor(UIWindow *window, int cursor);
 void _UIWindowGetScreenPosition(UIWindow *window, int *x, int *y);

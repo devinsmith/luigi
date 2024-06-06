@@ -28,7 +28,7 @@
 void UIClipboardWriteText(UIWindow *window, char *text) {
 	if (OpenClipboard(window->hwnd)) {
 		EmptyClipboard();
-		HGLOBAL memory = GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT, _UIStringLength(text) + 1);
+		HGLOBAL memory = GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT, UIStringLength(text) + 1);
 		char *copy = (char *) GlobalLock(memory);
 		for (uintptr_t i = 0; text[i]; i++) copy[i] = text[i];
 		GlobalUnlock(copy);
@@ -71,7 +71,7 @@ char *UIClipboardReadTextStart(UIWindow *window, size_t *bytes) {
 	GlobalUnlock(memory);
 	CloseClipboard();
 	
-	if (bytes) *bytes = _UIStringLength(copy);
+	if (bytes) *bytes = UIStringLength(copy);
 	return copy;
 }
 
