@@ -714,6 +714,9 @@ bool UIIsPanel(const UIElement *element);
 bool UIIsButton(const UIElement *element);
 bool UIIsMDIChild(const UIElement *element);
 
+// Themes
+const UITheme *UIGetCurrentTheme();
+
 void UIAssert(const char *exp, const char *filename, unsigned int line);
 void UIFree(void *ptr);
 

@@ -25,6 +25,7 @@ configure_file(config.h.in config.h)
 configure_file(luigi.pc.in luigi.pc @ONLY)
 
 add_subdirectory(src)
+add_subdirectory(test)
 
 include(CMakePackageConfigHelpers)
 

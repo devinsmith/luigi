@@ -2438,3 +2438,7 @@ void *_UIHeapReAlloc(void *pointer, size_t size) {
 
 #endif
 
+const UITheme *UIGetCurrentTheme()
+{
+  return &ui.theme;
+}
