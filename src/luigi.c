@@ -20,7 +20,6 @@
 // IN THE SOFTWARE.
 //
 
-#define UI_LINUX
 // Put the library implementation in this translation unit.
 #include "luigi.h"
 

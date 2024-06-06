@@ -108,27 +108,27 @@ jobs:
         # for more detail
         run: ctest -C $BUILD_TYPE
 
-      - name: Install & Strip
-        shell: bash
-        run: cmake --install . --strip
+#      - name: Install & Strip
+#        shell: bash
+#        run: cmake --install . --strip
 
-      - name: Pack
-        shell: bash
-        working-directory: instdir
-        run: |
-          ls -laR
-          ${{ matrix.config.archiver }} ../${{ matrix.config.artifact }} .
+#      - name: Pack
+#        shell: bash
+#        working-directory: instdir
+#        run: |
+#          ls -laR
+#          ${{ matrix.config.archiver }} ../${{ matrix.config.artifact }} .
 
-      - name: Upload
-        uses: actions/upload-artifact@v4
-        with:
-          path: ./${{ matrix.config.artifact }}
-          name: ${{ matrix.config.artifact }}
+#      - name: Upload
+#        uses: actions/upload-artifact@v4
+#        with:
+#          path: ./${{ matrix.config.artifact }}
+#          name: ${{ matrix.config.artifact }}
 
-      - name: Upload release asset
-        if: github.event_name == 'release' && (github.event.action == 'published' || github.event.action == 'created')
-        uses: softprops/action-gh-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          files: ${{ matrix.config.artifact }}
+#      - name: Upload release asset
+#        if: github.event_name == 'release' && (github.event.action == 'published' || github.event.action == 'created')
+#        uses: softprops/action-gh-release@v2
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          files: ${{ matrix.config.artifact }}

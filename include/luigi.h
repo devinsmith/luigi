@@ -29,6 +29,8 @@
 #ifndef LUIGI_H
 #define LUIGI_H
 
+#include <config.h>
+
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
