@@ -1,0 +1,11 @@
+prefix="@CMAKE_INSTALL_PREFIX@"
+exec_prefix="${prefix}"
+libdir="${prefix}/lib"
+includedir="${prefix}/include/luigi-@LUIGI_MAJOR_VERSION@.@LUIGI_MINOR_VERSION@"
+
+Name: Luigi
+Description: A barebones GUI library for Win32 and X11.
+Version: @VERSION@
+Libs: -L${libdir} -lluigi-@LUIGI_MAJOR_VERSION@.@LUIGI_MINOR_VERSION@
+Cflags: -I"${includedir}"
+

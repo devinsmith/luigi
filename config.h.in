@@ -1,0 +1,9 @@
+// Define to 1 if this is a Linux like system.
+#cmakedefine UI_LINUX 1
+
+// Define to 1 if this is a Windows system.
+#cmakedefine UI_WINDOWS 1
+
+// Define to 1 if you want to use FreeType
+#cmakedefine UI_FREETYPE 1
+
