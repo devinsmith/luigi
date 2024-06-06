@@ -42,7 +42,7 @@ target_link_libraries(${PROJECT_NAME} ${LIBS})
 target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
 
 if(MSVC)
-  target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX)
+  target_compile_options(${PROJECT_NAME} PRIVATE /W3 /WX)
 else()
   target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Werror)
 endif()
