@@ -10,3 +10,7 @@ are:
 * Built using CMake.
 * Removal of Essence port (CMake does not support Essence).
 
+There are also slight changes that make this no longer compatible with nakst's
+version. The biggest change is making the `ui` context variable opaque.
+Accessing properties of this structure are done via some new functions. Please
+see example apps.
