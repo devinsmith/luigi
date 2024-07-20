@@ -713,6 +713,7 @@ bool UIIsMDIChild(const UIElement *element);
 const UITheme *UIGetCurrentTheme();
 void UISetCurrentTheme(UITheme *theme);
 void UISetDarkTheme();
+void UISetLightTheme();
 
 void UIAssert(const char *exp, const char *filename, unsigned int line);
 void UIFree(void *ptr);

@@ -1,18 +1,18 @@
 
 set(INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/include ${CMAKE_CURRENT_LIST_DIR} ${CMAKE_BINARY_DIR})
 
-set(SOURCES
-  luigi_example.c
-)
+set(LUIGI_TESTS luigi_example todo_list_example unit_converter_example)
 
-add_executable(luigi_test ${SOURCES})
-target_link_libraries(luigi_test luigi)
-target_include_directories(luigi_test PRIVATE ${INCLUDE_DIRS})
+foreach (LUIGI_TEST IN LISTS LUIGI_TESTS)
+  add_executable(${LUIGI_TEST} "${LUIGI_TEST}.c")
+  target_link_libraries(${LUIGI_TEST} luigi)
+  target_include_directories(${LUIGI_TEST} PRIVATE ${INCLUDE_DIRS})
+  if(MSVC)
+    target_compile_options(${LUIGI_TEST} PRIVATE /W3)
+  else()
+    target_compile_options(${LUIGI_TEST} PRIVATE -Wall -Werror)
+  endif()
+endforeach()
 
-if(MSVC)
-  target_compile_options(${PROJECT_NAME} PRIVATE /W3)
-else()
-  target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Werror)
-endif()
 
 

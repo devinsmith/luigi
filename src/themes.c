@@ -98,3 +98,8 @@ void UISetDarkTheme()
 {
   ui.theme = &_uiThemeDark;
 }
+
+void UISetLightTheme()
+{
+  ui.theme = &_uiThemeClassic;
+}
