@@ -90,7 +90,7 @@ static int uiScrollBarMessage(UIElement *element, UIMessage message, int di, voi
 		}
 	} else if (message == UI_MSG_PAINT) {
 		if (scrollBar->page >= scrollBar->maximum || scrollBar->maximum <= 0 || scrollBar->page <= 0) {
-			UIDrawBlock((UIPainter *) dp, element->bounds, ui.theme.panel1);
+			UIDrawBlock((UIPainter *) dp, element->bounds, ui.theme->panel1);
 		}
 	} else if (message == UI_MSG_MOUSE_WHEEL) {
 		scrollBar->position += di;
@@ -108,20 +108,20 @@ static int uiScrollUpDownMessage(UIElement *element, UIMessage message, int di, 
 
 	if (message == UI_MSG_PAINT) {
 		UIPainter *painter = (UIPainter *) dp;
-		uint32_t color = element == element->window->pressed ? ui.theme.buttonPressed 
-			: element == element->window->hovered ? ui.theme.buttonHovered : ui.theme.panel2;
-		UIDrawRectangle(painter, element->bounds, color, ui.theme.border, UI_RECT_1(0));
+		uint32_t color = element == element->window->pressed ? ui.theme->buttonPressed
+			: element == element->window->hovered ? ui.theme->buttonHovered : ui.theme->panel2;
+		UIDrawRectangle(painter, element->bounds, color, ui.theme->border, UI_RECT_1(0));
 		
 		if (scrollBar->horizontal) {
 			UIDrawGlyph(painter, isDown ? (element->bounds.r - ui.activeFont->glyphWidth - 2 * element->window->scale) 
 					: (element->bounds.l + 2 * element->window->scale), 
 				(element->bounds.t + element->bounds.b - ui.activeFont->glyphHeight) / 2,
-				isDown ? 26 : 27, ui.theme.text);
+				isDown ? 26 : 27, ui.theme->text);
 		} else {
 			UIDrawGlyph(painter, (element->bounds.l + element->bounds.r - ui.activeFont->glyphWidth) / 2 + 1, 
 				isDown ? (element->bounds.b - ui.activeFont->glyphHeight - 2 * element->window->scale) 
 					: (element->bounds.t + 2 * element->window->scale), 
-				isDown ? 25 : 24, ui.theme.text);
+				isDown ? 25 : 24, ui.theme->text);
 		}
 	} else if (message == UI_MSG_UPDATE) {
 		UIElementRepaint(element, NULL);
@@ -156,9 +156,9 @@ static int uiScrollThumbMessage(UIElement *element, UIMessage message, int di, v
 
 	if (message == UI_MSG_PAINT) {
 		UIPainter *painter = (UIPainter *) dp;
-		uint32_t color = element == element->window->pressed ? ui.theme.buttonPressed 
-			: element == element->window->hovered ? ui.theme.buttonHovered : ui.theme.buttonNormal;
-		UIDrawRectangle(painter, element->bounds, color, ui.theme.border, UI_RECT_1(2));
+		uint32_t color = element == element->window->pressed ? ui.theme->buttonPressed
+			: element == element->window->hovered ? ui.theme->buttonHovered : ui.theme->buttonNormal;
+		UIDrawRectangle(painter, element->bounds, color, ui.theme->border, UI_RECT_1(2));
 	} else if (message == UI_MSG_UPDATE) {
 		UIElementRepaint(element, NULL);
 	} else if (message == UI_MSG_MOUSE_DRAG && element->window->pressedButton == 1) {

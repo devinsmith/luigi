@@ -35,8 +35,8 @@ static int uiDialogWrapperMessage(UIElement *element, UIMessage message, int di,
 		UIElementRepaint(element, NULL);
 	} else if (message == UI_MSG_PAINT) {
 		UIRectangle bounds = UIRectangleAdd(element->children->bounds, UI_RECT_1I(-1));
-		UIDrawBorder((UIPainter *) dp, bounds, ui.theme.border, UI_RECT_1(1));
-		UIDrawBorder((UIPainter *) dp, UIRectangleAdd(bounds, UI_RECT_1(1)), ui.theme.border, UI_RECT_1(1));
+		UIDrawBorder((UIPainter *) dp, bounds, ui.theme->border, UI_RECT_1(1));
+		UIDrawBorder((UIPainter *) dp, UIRectangleAdd(bounds, UI_RECT_1(1)), ui.theme->border, UI_RECT_1(1));
 	} else if (message == UI_MSG_KEY_TYPED) {
 		UIKeyTyped *typed = (UIKeyTyped *) dp;
 

@@ -31,7 +31,7 @@ static int uiTabPaneMessage(UIElement *element, UIMessage message, int di, void 
 		UIPainter *painter = (UIPainter *) dp;
 		UIRectangle top = element->bounds;
 		top.b = top.t + UI_SIZE_BUTTON_HEIGHT * element->window->scale;
-		UIDrawRectangle(painter, top, ui.theme.panel1, ui.theme.border, UI_RECT_4(0, 0, 0, 1));
+		UIDrawRectangle(painter, top, ui.theme->panel1, ui.theme->border, UI_RECT_4(0, 0, 0, 1));
 
 		UIRectangle tab = top;
 		tab.l += UI_SIZE_TAB_PANE_SPACE_LEFT * element->window->scale;
@@ -47,7 +47,7 @@ static int uiTabPaneMessage(UIElement *element, UIMessage message, int di, void 
 			int width = UIMeasureStringWidth(tabPane->tabs, end - position);
 			tab.r = tab.l + width + UI_SIZE_BUTTON_PADDING;
 
-			uint32_t color = tabPane->active == index ? ui.theme.buttonPressed : ui.theme.buttonNormal;
+			uint32_t color = tabPane->active == index ? ui.theme->buttonPressed : ui.theme->buttonNormal;
 
 			UIRectangle t = tab;
 
@@ -58,8 +58,8 @@ static int uiTabPaneMessage(UIElement *element, UIMessage message, int di, void 
 				t.t++;
 			}
 
-			UIDrawRectangle(painter, t, color, ui.theme.border, UI_RECT_1(1));
-			UIDrawString(painter, tab, tabPane->tabs + position, end - position, ui.theme.text, UI_ALIGN_CENTER, NULL);
+			UIDrawRectangle(painter, t, color, ui.theme->border, UI_RECT_1(1));
+			UIDrawString(painter, tab, tabPane->tabs + position, end - position, ui.theme->text, UI_ALIGN_CENTER, NULL);
 			tab.l = tab.r - 1;
 
 			if (tabPane->tabs[end] == '\t') {

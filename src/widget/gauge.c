@@ -33,10 +33,10 @@ static int uiGaugeMessage(UIElement *element, UIMessage message, int di, void *d
 		return UI_SIZE_GAUGE_WIDTH * element->window->scale;
 	} else if (message == UI_MSG_PAINT) {
 		UIPainter *painter = (UIPainter *) dp;
-		UIDrawRectangle(painter, element->bounds, ui.theme.buttonNormal, ui.theme.border, UI_RECT_1(1));
+		UIDrawRectangle(painter, element->bounds, ui.theme->buttonNormal, ui.theme->border, UI_RECT_1(1));
 		UIRectangle filled = UIRectangleAdd(element->bounds, UI_RECT_1I(1));
 		filled.r = filled.l + UI_RECT_WIDTH(filled) * gauge->position;
-		UIDrawBlock(painter, filled, ui.theme.selected);
+		UIDrawBlock(painter, filled, ui.theme->selected);
 	}
 
 	return 0;

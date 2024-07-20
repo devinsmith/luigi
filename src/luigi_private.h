@@ -35,7 +35,7 @@
 struct ui_ctx {
 	UIWindow *windows;
 	UIElement *animating;
-	UITheme theme;
+	UITheme *theme;
 
 	UIElement *parentStack[16];
 	int parentStackCount;
@@ -84,6 +84,8 @@ UIWindow *X11FindWindow(Window window);
 #ifdef UI_WINDOWS
 void *_UIHeapReAlloc(void *pointer, size_t size);
 #endif
+
+#define UI_FREE UIFree
 
 void _UIWindowEndPaint(UIWindow *window, UIPainter *painter);
 void _UIWindowSetCursor(UIWindow *window, int cursor);

@@ -124,8 +124,8 @@ static int uiTextboxMessage(UIElement *element, UIMessage message, int di, void 
 		bool focused = element->window->focused == element;
 		bool disabled = element->flags & UI_ELEMENT_DISABLED;
 		UIDrawRectangle(painter, element->bounds, 
-			disabled ? ui.theme.buttonDisabled : focused ? ui.theme.textboxFocused : ui.theme.textboxNormal, 
-			ui.theme.border, UI_RECT_1(1));
+			disabled ? ui.theme->buttonDisabled : focused ? ui.theme->textboxFocused : ui.theme->textboxNormal,
+			ui.theme->border, UI_RECT_1(1));
 #ifdef __cplusplus
 		UIStringSelection selection = {};
 #else
@@ -133,11 +133,11 @@ static int uiTextboxMessage(UIElement *element, UIMessage message, int di, void 
 #endif
 		selection.carets[0] = textbox->carets[0];
 		selection.carets[1] = textbox->carets[1];
-		selection.colorBackground = ui.theme.selected;
-		selection.colorText = ui.theme.textSelected;
+		selection.colorBackground = ui.theme->selected;
+		selection.colorText = ui.theme->textSelected;
 		textBounds.l -= textbox->scroll;
 		UIDrawString(painter, textBounds, textbox->string, textbox->bytes, 
-			disabled ? ui.theme.textDisabled : ui.theme.text, UI_ALIGN_LEFT, focused ? &selection : NULL);
+			disabled ? ui.theme->textDisabled : ui.theme->text, UI_ALIGN_LEFT, focused ? &selection : NULL);
 	} else if (message == UI_MSG_GET_CURSOR) {
 		return UI_CURSOR_TEXT;
 	} else if (message == UI_MSG_LEFT_DOWN) {

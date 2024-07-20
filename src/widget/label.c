@@ -33,7 +33,7 @@ static int uiLabelMessage(UIElement *element, UIMessage message, int di, void *d
     return UIMeasureStringWidth(label->label, label->labelBytes);
   } else if (message == UI_MSG_PAINT) {
     UIPainter *painter = (UIPainter *) dp;
-    UIDrawString(painter, element->bounds, label->label, label->labelBytes, ui.theme.text, UI_ALIGN_LEFT, NULL);
+    UIDrawString(painter, element->bounds, label->label, label->labelBytes, ui.theme->text, UI_ALIGN_LEFT, NULL);
   } else if (message == UI_MSG_DESTROY) {
     UIFree(label->label);
   }

@@ -32,7 +32,7 @@ static int uiSpacerMessage(UIElement *element, UIMessage message, int di, void *
 	} else if (message == UI_MSG_GET_WIDTH) {
 		return spacer->width * element->window->scale;
 	} else if (message == UI_MSG_PAINT && (element->flags & UI_SPACER_LINE)) {
-		UIDrawBlock((UIPainter *) dp, element->bounds, ui.theme.border);
+		UIDrawBlock((UIPainter *) dp, element->bounds, ui.theme->border);
 	}
 
 	return 0;

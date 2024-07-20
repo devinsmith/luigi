@@ -16,6 +16,7 @@ set(SOURCES
   luigi_private.h
   string.c
   utils.c
+  themes.c
 
   widget/button.c
   widget/code.c

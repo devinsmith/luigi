@@ -32,7 +32,7 @@ static int uiSplitterMessage(UIElement *element, UIMessage message, int di, void
 
 	if (message == UI_MSG_PAINT) {
 		UIRectangle borders = vertical ? UI_RECT_2(0, 1) : UI_RECT_2(1, 0);
-		UIDrawRectangle((UIPainter *) dp, element->bounds, ui.theme.buttonNormal, ui.theme.border, borders);
+		UIDrawRectangle((UIPainter *) dp, element->bounds, ui.theme->buttonNormal, ui.theme->border, borders);
 	} else if (message == UI_MSG_GET_CURSOR) {
 		return vertical ? UI_CURSOR_SPLIT_V : UI_CURSOR_SPLIT_H;
 	} else if (message == UI_MSG_MOUSE_DRAG) {

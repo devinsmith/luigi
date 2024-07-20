@@ -39,13 +39,13 @@ static int uiSliderMessage(UIElement *element, UIMessage message, int di, void *
 		int thumbSize = UI_SIZE_SLIDER_THUMB * element->window->scale;
 		int thumbPosition = (UI_RECT_WIDTH(bounds) - thumbSize) * slider->position;
 		UIRectangle track = UI_RECT_4(bounds.l, bounds.r, centerY - (trackSize + 1) / 2, centerY + trackSize / 2);
-		UIDrawRectangle(painter, track, ui.theme.buttonNormal, ui.theme.border, UI_RECT_1(1));
+		UIDrawRectangle(painter, track, ui.theme->buttonNormal, ui.theme->border, UI_RECT_1(1));
 		bool pressed = element == element->window->pressed;
 		bool hovered = element == element->window->hovered;
 		bool disabled = element->flags & UI_ELEMENT_DISABLED;
-		uint32_t color = disabled ? ui.theme.buttonDisabled : pressed ? ui.theme.buttonPressed : hovered ? ui.theme.buttonHovered : ui.theme.buttonNormal;
+		uint32_t color = disabled ? ui.theme->buttonDisabled : pressed ? ui.theme->buttonPressed : hovered ? ui.theme->buttonHovered : ui.theme->buttonNormal;
 		UIRectangle thumb = UI_RECT_4(bounds.l + thumbPosition, bounds.l + thumbPosition + thumbSize, centerY - (thumbSize + 1) / 2, centerY + thumbSize / 2);
-		UIDrawRectangle(painter, thumb, color, ui.theme.border, UI_RECT_1(1));
+		UIDrawRectangle(painter, thumb, color, ui.theme->border, UI_RECT_1(1));
 	} else if (message == UI_MSG_LEFT_DOWN || (message == UI_MSG_MOUSE_DRAG && element->window->pressedButton == 1)) {
 		UIRectangle bounds = element->bounds;
 		int thumbSize = UI_SIZE_SLIDER_THUMB * element->window->scale;

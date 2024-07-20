@@ -51,12 +51,12 @@ int UIDrawStringHighlighted(UIPainter *painter, UIRectangle lineBounds, const ch
 	if (bytes > 10000) bytes = 10000;
 
 	uint32_t colors[] = {
-		ui.theme.codeDefault,
-		ui.theme.codeComment,
-		ui.theme.codeString,
-		ui.theme.codeNumber,
-		ui.theme.codeOperator,
-		ui.theme.codePreprocessor,
+		ui.theme->codeDefault,
+		ui.theme->codeComment,
+		ui.theme->codeString,
+		ui.theme->codeNumber,
+		ui.theme->codeOperator,
+		ui.theme->codePreprocessor,
 	};
 
 	int x = lineBounds.l;
@@ -161,7 +161,7 @@ int _UICodeMessage(UIElement *element, UIMessage message, int di, void *dp) {
 		int lineHeight = UIMeasureStringHeight();
 		lineBounds.t -= (int64_t) code->vScroll->position % lineHeight;
 
-		UIDrawBlock(painter, element->bounds, ui.theme.codeBackground);
+		UIDrawBlock(painter, element->bounds, ui.theme->codeBackground);
 
 		for (int i = code->vScroll->position / lineHeight; i < code->lineCount; i++) {
 			if (lineBounds.t > element->clip.b) {
@@ -190,11 +190,11 @@ int _UICodeMessage(UIElement *element, UIMessage message, int di, void *dp) {
 					UIDrawBlock(painter, marginBounds, marginColor);
 				}
 
-				UIDrawString(painter, marginBounds, string + p, 16 - p, ui.theme.codeDefault, UI_ALIGN_RIGHT, NULL);
+				UIDrawString(painter, marginBounds, string + p, 16 - p, ui.theme->codeDefault, UI_ALIGN_RIGHT, NULL);
 			}
 
 			if (code->focused == i) {
-				UIDrawBlock(painter, lineBounds, ui.theme.codeFocused);
+				UIDrawBlock(painter, lineBounds, ui.theme->codeFocused);
 			}
 
 			int x = UIDrawStringHighlighted(painter, lineBounds, code->content + code->lines[i].offset, code->lines[i].bytes, code->tabSize);

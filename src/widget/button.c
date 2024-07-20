@@ -29,12 +29,12 @@ static void uiButtonCalculateColors(UIElement *element, uint32_t *color, uint32_
 	bool focused = element == element->window->focused;
 	bool pressed = element == element->window->pressed;
 	bool hovered = element == element->window->hovered;
-	*color = disabled ? ui.theme.buttonDisabled
-		: (pressed && hovered) ? ui.theme.buttonPressed 
-		: (pressed || hovered) ? ui.theme.buttonHovered 
-		: focused ? ui.theme.selected : ui.theme.buttonNormal;
-	*textColor = disabled ? ui.theme.textDisabled 
-		: *color == ui.theme.selected ? ui.theme.textSelected : ui.theme.text;
+	*color = disabled ? ui.theme->buttonDisabled
+		: (pressed && hovered) ? ui.theme->buttonPressed
+		: (pressed || hovered) ? ui.theme->buttonHovered
+		: focused ? ui.theme->selected : ui.theme->buttonNormal;
+	*textColor = disabled ? ui.theme->textDisabled
+		: *color == ui.theme->selected ? ui.theme->textSelected : ui.theme->text;
 }
 
 
@@ -64,11 +64,11 @@ static int uiButtonMessage(UIElement *element, UIMessage message, int di, void *
 		uint32_t color, textColor;
     uiButtonCalculateColors(element, &color, &textColor);
 
-		UIDrawRectangle(painter, element->bounds, color, ui.theme.border, UI_RECT_1(isMenuItem ? 0 : 1));
+		UIDrawRectangle(painter, element->bounds, color, ui.theme->border, UI_RECT_1(isMenuItem ? 0 : 1));
 
 		if (element->flags & UI_BUTTON_CHECKED) {
 			UIDrawBlock(painter, UIRectangleAdd(element->bounds, 
-				UI_RECT_1I((int) (UI_SIZE_BUTTON_CHECKED_AREA * element->window->scale))), ui.theme.buttonPressed);
+				UI_RECT_1I((int) (UI_SIZE_BUTTON_CHECKED_AREA * element->window->scale))), ui.theme->buttonPressed);
 		}
 
 		UIRectangle bounds = UIRectangleAdd(element->bounds, UI_RECT_2I((int) (UI_SIZE_MENU_ITEM_MARGIN * element->window->scale), 0));
@@ -142,7 +142,7 @@ static int uiCheckboxMessage(UIElement *element, UIMessage message, int di, void
     int midY = (element->bounds.t + element->bounds.b) / 2;
     UIRectangle boxBounds = UI_RECT_4(element->bounds.l, element->bounds.l + UI_SIZE_CHECKBOX_BOX,
                                       midY - UI_SIZE_CHECKBOX_BOX / 2, midY + UI_SIZE_CHECKBOX_BOX / 2);
-    UIDrawRectangle(painter, boxBounds, color, ui.theme.border, UI_RECT_1(1));
+    UIDrawRectangle(painter, boxBounds, color, ui.theme->border, UI_RECT_1(1));
     UIDrawString(painter, UIRectangleAdd(boxBounds, UI_RECT_4(1, 0, 0, 0)),
                  box->check == UI_CHECK_CHECKED ? "*" : box->check == UI_CHECK_INDETERMINATE ? "-" : " ", -1,
                  textColor, UI_ALIGN_CENTER, NULL);

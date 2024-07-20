@@ -64,10 +64,10 @@ static int uiMDIChildMessage(UIElement *element, UIMessage message, int di, void
 		UI_MDI_CHILD_CALCULATE_LAYOUT();
 		UIPainter *painter = (UIPainter *) dp;
 		UIRectangle borders = UI_RECT_4(borderSize, borderSize, titleSize, borderSize);
-		UIDrawBorder(painter, element->bounds, ui.theme.buttonNormal, borders);
-		UIDrawBorder(painter, element->bounds, ui.theme.border, UI_RECT_1((int) element->window->scale));
-		UIDrawBorder(painter, UIRectangleAdd(content, UI_RECT_1I(-1)), ui.theme.border, UI_RECT_1((int) element->window->scale));
-		UIDrawString(painter, title, mdiChild->title, mdiChild->titleBytes, ui.theme.text, UI_ALIGN_LEFT, NULL);
+		UIDrawBorder(painter, element->bounds, ui.theme->buttonNormal, borders);
+		UIDrawBorder(painter, element->bounds, ui.theme->border, UI_RECT_1((int) element->window->scale));
+		UIDrawBorder(painter, UIRectangleAdd(content, UI_RECT_1I(-1)), ui.theme->border, UI_RECT_1((int) element->window->scale));
+		UIDrawString(painter, title, mdiChild->title, mdiChild->titleBytes, ui.theme->text, UI_ALIGN_LEFT, NULL);
 	} else if (message == UI_MSG_GET_WIDTH) {
 		UIElement *child = element->children;
 		while (child && child->next) child = child->next;
@@ -142,7 +142,7 @@ static int uiMDIClientMessage(UIElement *element, UIMessage message, int di, voi
 	UIMDIClient *client = (UIMDIClient *) element;
 
 	if (message == UI_MSG_PAINT) {
-		UIDrawBlock((UIPainter *) dp, element->bounds, (element->flags & UI_MDI_CLIENT_TRANSPARENT) ? 0 : ui.theme.panel2);
+		UIDrawBlock((UIPainter *) dp, element->bounds, (element->flags & UI_MDI_CLIENT_TRANSPARENT) ? 0 : ui.theme->panel2);
 	} else if (message == UI_MSG_LAYOUT) {
 		UIElement *child = element->children;
 

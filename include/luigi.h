@@ -36,9 +36,6 @@
 #include <stdbool.h>
 #include <stdarg.h>
 
-#define _UI_TO_STRING_1(x) #x
-#define _UI_TO_STRING_2(x) _UI_TO_STRING_1(x)
-
 // Branch prediction optimization
 #if (__GNUC__ >= 3)
 #define __likely(cond)    __builtin_expect(!!(cond),1)
@@ -53,8 +50,6 @@
 #else
 #define UI_ASSERT(x) ((void)0)
 #endif
-
-#define UI_FREE UIFree
 
 #ifdef WIN32
 #undef _UNICODE
@@ -716,6 +711,8 @@ bool UIIsMDIChild(const UIElement *element);
 
 // Themes
 const UITheme *UIGetCurrentTheme();
+void UISetCurrentTheme(UITheme *theme);
+void UISetDarkTheme();
 
 void UIAssert(const char *exp, const char *filename, unsigned int line);
 void UIFree(void *ptr);

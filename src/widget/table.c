@@ -134,7 +134,7 @@ static int uiTableMessage(UIElement *element, UIMessage message, int di, void *d
 		UIPainter *painter = (UIPainter *) dp;
 		UIRectangle bounds = element->bounds;
 		bounds.r -= UI_SIZE_SCROLL_BAR * element->window->scale;
-		UIDrawBlock(painter, bounds, ui.theme.panel2);
+		UIDrawBlock(painter, bounds, ui.theme->panel2);
 		char buffer[256];
 		UIRectangle row = bounds;
 		int rowHeight = UI_SIZE_TABLE_ROW * element->window->scale;
@@ -155,13 +155,13 @@ static int uiTableMessage(UIElement *element, UIMessage message, int di, void *d
 			m.isSelected = false;
 			m.column = 0;
 			int bytes = UIElementMessage(element, UI_MSG_TABLE_GET_ITEM, 0, &m);
-			uint32_t textColor = ui.theme.text;
+			uint32_t textColor = ui.theme->text;
 
 			if (m.isSelected) {
-				UIDrawBlock(painter, row, ui.theme.selected);
-				textColor = ui.theme.textSelected;
+				UIDrawBlock(painter, row, ui.theme->selected);
+				textColor = ui.theme->textSelected;
 			} else if (hovered == i) {
-				UIDrawBlock(painter, row, ui.theme.buttonHovered);
+				UIDrawBlock(painter, row, ui.theme->buttonHovered);
 			}
 
 			UIRectangle cell = row;
@@ -184,7 +184,7 @@ static int uiTableMessage(UIElement *element, UIMessage message, int di, void *d
 
 		UIRectangle header = bounds;
 		header.b = header.t + UI_SIZE_TABLE_HEADER * table->e.window->scale;
-		UIDrawRectangle(painter, header, ui.theme.panel1, ui.theme.border, UI_RECT_4(0, 0, 0, 1));
+		UIDrawRectangle(painter, header, ui.theme->panel1, ui.theme->border, UI_RECT_4(0, 0, 0, 1));
 		header.l += UI_SIZE_TABLE_COLUMN_GAP * table->e.window->scale;
 
 		int position = 0;
@@ -196,7 +196,7 @@ static int uiTableMessage(UIElement *element, UIMessage message, int di, void *d
 				for (; table->columns[end] != '\t' && table->columns[end]; end++);
 
 				header.r = header.l + table->columnWidths[index];
-				UIDrawString(painter, header, table->columns + position, end - position, ui.theme.text, UI_ALIGN_LEFT, NULL);
+				UIDrawString(painter, header, table->columns + position, end - position, ui.theme->text, UI_ALIGN_LEFT, NULL);
 				if (index == table->columnHighlight) UIDrawInvert(painter, header);
 				header.l += table->columnWidths[index] + UI_SIZE_TABLE_COLUMN_GAP * table->e.window->scale;
 

@@ -163,13 +163,13 @@ static int uiPanelMessage(UIElement *element, UIMessage message, int di, void *d
 		}
 	} else if (message == UI_MSG_PAINT) {
 		if (element->flags & UI_PANEL_GRAY) {
-			UIDrawBlock((UIPainter *) dp, element->bounds, ui.theme.panel1);
+			UIDrawBlock((UIPainter *) dp, element->bounds, ui.theme->panel1);
 		} else if (element->flags & UI_PANEL_WHITE) {
-			UIDrawBlock((UIPainter *) dp, element->bounds, ui.theme.panel2);
+			UIDrawBlock((UIPainter *) dp, element->bounds, ui.theme->panel2);
 		} 
 		
 		if (element->flags & UI_PANEL_BORDER) {
-			UIDrawBorder((UIPainter *) dp, element->bounds, ui.theme.border, UI_RECT_1((int) element->window->scale));
+			UIDrawBorder((UIPainter *) dp, element->bounds, ui.theme->border, UI_RECT_1((int) element->window->scale));
 		}
 	} else if (message == UI_MSG_MOUSE_WHEEL && panel->scrollBar) {
 		return UIElementMessage(&panel->scrollBar->e, message, di, dp);
