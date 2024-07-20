@@ -14,6 +14,7 @@ set(SOURCES
   clipboard.c
   luigi.c
   luigi_private.h
+  rect.c
   string.c
   utils.c
   themes.c

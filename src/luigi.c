@@ -64,46 +64,6 @@ const uint64_t _uiFont[] = {
 	0x1800181818180000UL, 0x0000000018181818UL, 0x18701818180E0000UL, 0x000000000E181818UL, 0x000000003B6E0000UL, 0x0000000000000000UL, 0x63361C0800000000UL, 0x00000000007F6363UL, 
 };
 
-UIRectangle UIRectangleIntersection(UIRectangle a, UIRectangle b) {
-	if (a.l < b.l) a.l = b.l;
-	if (a.t < b.t) a.t = b.t;
-	if (a.r > b.r) a.r = b.r;
-	if (a.b > b.b) a.b = b.b;
-	return a;
-}
-
-UIRectangle UIRectangleBounding(UIRectangle a, UIRectangle b) {
-	if (a.l > b.l) a.l = b.l;
-	if (a.t > b.t) a.t = b.t;
-	if (a.r < b.r) a.r = b.r;
-	if (a.b < b.b) a.b = b.b;
-	return a;
-}
-
-UIRectangle UIRectangleAdd(UIRectangle a, UIRectangle b) {
-	a.l += b.l;
-	a.t += b.t;
-	a.r += b.r;
-	a.b += b.b;
-	return a;
-}
-
-UIRectangle UIRectangleTranslate(UIRectangle a, UIRectangle b) {
-	a.l += b.l;
-	a.t += b.t;
-	a.r += b.l;
-	a.b += b.t;
-	return a;
-}
-
-bool UIRectangleEquals(UIRectangle a, UIRectangle b) {
-	return a.l == b.l && a.r == b.r && a.t == b.t && a.b == b.b;
-}
-
-bool UIRectangleContains(UIRectangle a, int x, int y) {
-	return a.l <= x && a.r > x && a.t <= y && a.b > y;
-}
-
 void UIElementRefresh(UIElement *element) {
 	UIElementMessage(element, UI_MSG_LAYOUT, 0, 0);
 	UIElementRepaint(element, NULL);
