@@ -21,6 +21,7 @@
 //
 
 #include <luigi.h>
+#include "luigi_private.h"
 
 bool UICharIsAlpha(char c) {
 	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
@@ -32,4 +33,38 @@ bool UICharIsDigit(char c) {
 
 bool UICharIsAlphaOrDigitOrUnderscore(char c) {
 	return UICharIsAlpha(c) || UICharIsDigit(c) || c == '_';
+}
+
+ptrdiff_t UIStringLength(const char *cString) {
+	if (!cString) return 0;
+	ptrdiff_t length;
+	for (length = 0; cString[length]; length++);
+	return length;
+}
+
+char *UIStringCopy(const char *in, ptrdiff_t inBytes) {
+	if (inBytes == -1) {
+		inBytes = UIStringLength(in);
+	}
+
+	char *buffer = (char *) UI_MALLOC(inBytes + 1);
+	
+	for (intptr_t i = 0; i < inBytes; i++) {
+		buffer[i] = in[i];
+	}
+	
+	buffer[inBytes] = 0;
+	return buffer;
+}
+
+int UIMeasureStringWidth(const char *string, ptrdiff_t bytes) {
+	if (bytes == -1) {
+		bytes = UIStringLength(string);
+	}
+	
+	return bytes * ui.activeFont->glyphWidth;
+}
+
+int UIMeasureStringHeight() {
+	return ui.activeFont->glyphHeight;
 }

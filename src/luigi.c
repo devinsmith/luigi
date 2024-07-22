@@ -21,48 +21,9 @@
 //
 
 #include "luigi.h"
-
 #include "luigi_private.h"
 
 struct ui_ctx ui;
-
-// Taken from https://commons.wikimedia.org/wiki/File:Codepage-437.png
-// Public domain.
-
-const uint64_t _uiFont[] = {
-	0x0000000000000000UL, 0x0000000000000000UL, 0xBD8181A5817E0000UL, 0x000000007E818199UL, 0xC3FFFFDBFF7E0000UL, 0x000000007EFFFFE7UL, 0x7F7F7F3600000000UL, 0x00000000081C3E7FUL, 
-	0x7F3E1C0800000000UL, 0x0000000000081C3EUL, 0xE7E73C3C18000000UL, 0x000000003C1818E7UL, 0xFFFF7E3C18000000UL, 0x000000003C18187EUL, 0x3C18000000000000UL, 0x000000000000183CUL, 
-	0xC3E7FFFFFFFFFFFFUL, 0xFFFFFFFFFFFFE7C3UL, 0x42663C0000000000UL, 0x00000000003C6642UL, 0xBD99C3FFFFFFFFFFUL, 0xFFFFFFFFFFC399BDUL, 0x331E4C5870780000UL, 0x000000001E333333UL, 
-	0x3C666666663C0000UL, 0x0000000018187E18UL, 0x0C0C0CFCCCFC0000UL, 0x00000000070F0E0CUL, 0xC6C6C6FEC6FE0000UL, 0x0000000367E7E6C6UL, 0xE73CDB1818000000UL, 0x000000001818DB3CUL, 
-	0x1F7F1F0F07030100UL, 0x000000000103070FUL, 0x7C7F7C7870604000UL, 0x0000000040607078UL, 0x1818187E3C180000UL, 0x0000000000183C7EUL, 0x6666666666660000UL, 0x0000000066660066UL, 
-	0xD8DEDBDBDBFE0000UL, 0x00000000D8D8D8D8UL, 0x6363361C06633E00UL, 0x0000003E63301C36UL, 0x0000000000000000UL, 0x000000007F7F7F7FUL, 0x1818187E3C180000UL, 0x000000007E183C7EUL, 
-	0x1818187E3C180000UL, 0x0000000018181818UL, 0x1818181818180000UL, 0x00000000183C7E18UL, 0x7F30180000000000UL, 0x0000000000001830UL, 0x7F060C0000000000UL, 0x0000000000000C06UL, 
-	0x0303000000000000UL, 0x0000000000007F03UL, 0xFF66240000000000UL, 0x0000000000002466UL, 0x3E1C1C0800000000UL, 0x00000000007F7F3EUL, 0x3E3E7F7F00000000UL, 0x0000000000081C1CUL, 
-	0x0000000000000000UL, 0x0000000000000000UL, 0x18183C3C3C180000UL, 0x0000000018180018UL, 0x0000002466666600UL, 0x0000000000000000UL, 0x36367F3636000000UL, 0x0000000036367F36UL, 
-	0x603E0343633E1818UL, 0x000018183E636160UL, 0x1830634300000000UL, 0x000000006163060CUL, 0x3B6E1C36361C0000UL, 0x000000006E333333UL, 0x000000060C0C0C00UL, 0x0000000000000000UL, 
-	0x0C0C0C0C18300000UL, 0x0000000030180C0CUL, 0x30303030180C0000UL, 0x000000000C183030UL, 0xFF3C660000000000UL, 0x000000000000663CUL, 0x7E18180000000000UL, 0x0000000000001818UL, 
-	0x0000000000000000UL, 0x0000000C18181800UL, 0x7F00000000000000UL, 0x0000000000000000UL, 0x0000000000000000UL, 0x0000000018180000UL, 0x1830604000000000UL, 0x000000000103060CUL, 
-	0xDBDBC3C3663C0000UL, 0x000000003C66C3C3UL, 0x1818181E1C180000UL, 0x000000007E181818UL, 0x0C183060633E0000UL, 0x000000007F630306UL, 0x603C6060633E0000UL, 0x000000003E636060UL, 
-	0x7F33363C38300000UL, 0x0000000078303030UL, 0x603F0303037F0000UL, 0x000000003E636060UL, 0x633F0303061C0000UL, 0x000000003E636363UL, 0x18306060637F0000UL, 0x000000000C0C0C0CUL, 
-	0x633E6363633E0000UL, 0x000000003E636363UL, 0x607E6363633E0000UL, 0x000000001E306060UL, 0x0000181800000000UL, 0x0000000000181800UL, 0x0000181800000000UL, 0x000000000C181800UL, 
-	0x060C183060000000UL, 0x000000006030180CUL, 0x00007E0000000000UL, 0x000000000000007EUL, 0x6030180C06000000UL, 0x00000000060C1830UL, 0x18183063633E0000UL, 0x0000000018180018UL, 
-	0x7B7B63633E000000UL, 0x000000003E033B7BUL, 0x7F6363361C080000UL, 0x0000000063636363UL, 0x663E6666663F0000UL, 0x000000003F666666UL, 0x03030343663C0000UL, 0x000000003C664303UL, 
-	0x66666666361F0000UL, 0x000000001F366666UL, 0x161E1646667F0000UL, 0x000000007F664606UL, 0x161E1646667F0000UL, 0x000000000F060606UL, 0x7B030343663C0000UL, 0x000000005C666363UL, 
-	0x637F636363630000UL, 0x0000000063636363UL, 0x18181818183C0000UL, 0x000000003C181818UL, 0x3030303030780000UL, 0x000000001E333333UL, 0x1E1E366666670000UL, 0x0000000067666636UL, 
-	0x06060606060F0000UL, 0x000000007F664606UL, 0xC3DBFFFFE7C30000UL, 0x00000000C3C3C3C3UL, 0x737B7F6F67630000UL, 0x0000000063636363UL, 0x63636363633E0000UL, 0x000000003E636363UL, 
-	0x063E6666663F0000UL, 0x000000000F060606UL, 0x63636363633E0000UL, 0x000070303E7B6B63UL, 0x363E6666663F0000UL, 0x0000000067666666UL, 0x301C0663633E0000UL, 0x000000003E636360UL, 
-	0x18181899DBFF0000UL, 0x000000003C181818UL, 0x6363636363630000UL, 0x000000003E636363UL, 0xC3C3C3C3C3C30000UL, 0x00000000183C66C3UL, 0xDBC3C3C3C3C30000UL, 0x000000006666FFDBUL, 
-	0x18183C66C3C30000UL, 0x00000000C3C3663CUL, 0x183C66C3C3C30000UL, 0x000000003C181818UL, 0x0C183061C3FF0000UL, 0x00000000FFC38306UL, 0x0C0C0C0C0C3C0000UL, 0x000000003C0C0C0CUL, 
-	0x1C0E070301000000UL, 0x0000000040607038UL, 0x30303030303C0000UL, 0x000000003C303030UL, 0x0000000063361C08UL, 0x0000000000000000UL, 0x0000000000000000UL, 0x0000FF0000000000UL, 
-	0x0000000000180C0CUL, 0x0000000000000000UL, 0x3E301E0000000000UL, 0x000000006E333333UL, 0x66361E0606070000UL, 0x000000003E666666UL, 0x03633E0000000000UL, 0x000000003E630303UL, 
-	0x33363C3030380000UL, 0x000000006E333333UL, 0x7F633E0000000000UL, 0x000000003E630303UL, 0x060F0626361C0000UL, 0x000000000F060606UL, 0x33336E0000000000UL, 0x001E33303E333333UL, 
-	0x666E360606070000UL, 0x0000000067666666UL, 0x18181C0018180000UL, 0x000000003C181818UL, 0x6060700060600000UL, 0x003C666660606060UL, 0x1E36660606070000UL, 0x000000006766361EUL, 
-	0x18181818181C0000UL, 0x000000003C181818UL, 0xDBFF670000000000UL, 0x00000000DBDBDBDBUL, 0x66663B0000000000UL, 0x0000000066666666UL, 0x63633E0000000000UL, 0x000000003E636363UL, 
-	0x66663B0000000000UL, 0x000F06063E666666UL, 0x33336E0000000000UL, 0x007830303E333333UL, 0x666E3B0000000000UL, 0x000000000F060606UL, 0x06633E0000000000UL, 0x000000003E63301CUL, 
-	0x0C0C3F0C0C080000UL, 0x00000000386C0C0CUL, 0x3333330000000000UL, 0x000000006E333333UL, 0xC3C3C30000000000UL, 0x00000000183C66C3UL, 0xC3C3C30000000000UL, 0x0000000066FFDBDBUL, 
-	0x3C66C30000000000UL, 0x00000000C3663C18UL, 0x6363630000000000UL, 0x001F30607E636363UL, 0x18337F0000000000UL, 0x000000007F63060CUL, 0x180E181818700000UL, 0x0000000070181818UL, 
-	0x1800181818180000UL, 0x0000000018181818UL, 0x18701818180E0000UL, 0x000000000E181818UL, 0x000000003B6E0000UL, 0x0000000000000000UL, 0x63361C0800000000UL, 0x00000000007F6363UL, 
-};
 
 void UIElementRefresh(UIElement *element) {
 	UIElementMessage(element, UI_MSG_LAYOUT, 0, 0);
@@ -378,7 +339,8 @@ void UIDrawGlyph(UIPainter *painter, int x0, int y0, int c, uint32_t color) {
 
 	UIRectangle rectangle = UIRectangleIntersection(painter->clip, UI_RECT_4(x0, x0 + 8, y0, y0 + 16));
 
-	const uint8_t *data = (const uint8_t *) _uiFont + c * 16;
+//	const uint8_t *data = UIGet(const uint8_t *) _uiFont + c * 16;
+	const uint8_t *data = UIFontGetBuiltInData() + c * 16;
 
 	for (int i = rectangle.t; i < rectangle.b; i++) {
 		uint32_t *bits = painter->bits + i * painter->width + rectangle.l;
@@ -392,40 +354,6 @@ void UIDrawGlyph(UIPainter *painter, int x0, int y0, int c, uint32_t color) {
 			bits++;
 		}
 	}
-}
-
-ptrdiff_t UIStringLength(const char *cString) {
-	if (!cString) return 0;
-	ptrdiff_t length;
-	for (length = 0; cString[length]; length++);
-	return length;
-}
-
-char *UIStringCopy(const char *in, ptrdiff_t inBytes) {
-	if (inBytes == -1) {
-		inBytes = UIStringLength(in);
-	}
-
-	char *buffer = (char *) UI_MALLOC(inBytes + 1);
-	
-	for (intptr_t i = 0; i < inBytes; i++) {
-		buffer[i] = in[i];
-	}
-	
-	buffer[inBytes] = 0;
-	return buffer;
-}
-
-int UIMeasureStringWidth(const char *string, ptrdiff_t bytes) {
-	if (bytes == -1) {
-		bytes = UIStringLength(string);
-	}
-	
-	return bytes * ui.activeFont->glyphWidth;
-}
-
-int UIMeasureStringHeight() {
-	return ui.activeFont->glyphHeight;
 }
 
 void UIDrawString(UIPainter *painter, UIRectangle r, const char *string, ptrdiff_t bytes, uint32_t color, int align, UIStringSelection *selection) {
@@ -1154,32 +1082,6 @@ bool _UIWindowInputEvent(UIWindow *window, UIMessage message, int di, void *dp) 
 	return handled;
 }
 
-UIFont *UIFontCreate(const char *cPath, uint32_t size) {
-	UIFont *font = (UIFont *) UI_CALLOC(sizeof(UIFont));
-
-#ifdef UI_FREETYPE
-	if (cPath) {
-		if (!FT_New_Face(ui.ft, cPath, 0, &font->font)) {
-			FT_Set_Char_Size(font->font, 0, size * 64, 100, 100);
-			FT_Load_Char(font->font, 'a', FT_LOAD_DEFAULT);
-			font->glyphWidth = font->font->glyph->advance.x / 64;
-			font->glyphHeight = (font->font->size->metrics.ascender - font->font->size->metrics.descender) / 64;
-			font->isFreeType = true;
-			return font;
-		}
-	}
-#endif
-	
-	font->glyphWidth = 9;
-	font->glyphHeight = 16;
-	return font;
-}
-
-UIFont *UIFontActivate(UIFont *font) {
-	UIFont *previous = ui.activeFont;
-	ui.activeFont = font;
-	return previous;
-}
 
 void _UIInitialiseCommon() {
   UISetDarkTheme();
@@ -1215,223 +1117,6 @@ int _UIWindowMessageCommon(UIElement *element, UIMessage message, int di, void *
 
 	return 0;
 }
-
-#ifdef UI_DEBUG
-
-void UIInspectorLog(const char *cFormat, ...) {
-	va_list arguments;
-	va_start(arguments, cFormat);
-	char buffer[4096];
-	vsnprintf(buffer, sizeof(buffer), cFormat, arguments);
-	UICodeInsertContent(ui.inspectorLog, buffer, -1, false);
-	va_end(arguments);
-	UIElementRefresh(&ui.inspectorLog->e);
-}
-
-UIElement *_UIInspectorFindNthElement(UIElement *element, int *index, int *depth) {
-	if (*index == 0) {
-		return element;
-	}
-
-	*index = *index - 1;
-	
-	UIElement *child = element->children;
-
-	while (child) {
-		if (!(child->flags & (UI_ELEMENT_DESTROY | UI_ELEMENT_HIDE))) {
-			UIElement *result = _UIInspectorFindNthElement(child, index, depth);
-
-			if (result) {
-				if (depth) {
-					*depth = *depth + 1;
-				}
-
-				return result;
-			}
-		}
-
-		child = child->next;
-	}
-
-	return NULL;
-}
-
-int _UIInspectorTableMessage(UIElement *element, UIMessage message, int di, void *dp) {
-	if (!ui.inspectorTarget) {
-		return 0;
-	}
-
-	if (message == UI_MSG_TABLE_GET_ITEM) {
-		UITableGetItem *m = (UITableGetItem *) dp;
-		int index = m->index;
-		int depth = 0;
-		UIElement *element = _UIInspectorFindNthElement(&ui.inspectorTarget->e, &index, &depth);
-		if (!element) return 0;
-
-		if (m->column == 0) {
-			return snprintf(m->buffer, m->bufferBytes, "%.*s%s", depth * 2, "                ", element->cClassName);
-		} else if (m->column == 1) {
-			return snprintf(m->buffer, m->bufferBytes, "%d:%d, %d:%d", UI_RECT_ALL(element->bounds));
-		} else if (m->column == 2) {
-			return snprintf(m->buffer, m->bufferBytes, "%d%c", element->id, element->window->focused == element ? '*' : ' ');
-		}
-	} else if (message == UI_MSG_MOUSE_MOVE) {
-		int index = UITableHitTest(ui.inspectorTable, element->window->cursorX, element->window->cursorY);
-		UIElement *element = NULL;
-		if (index >= 0) element = _UIInspectorFindNthElement(&ui.inspectorTarget->e, &index, NULL);
-		UIWindow *window = ui.inspectorTarget;
-		UIPainter painter = { 0 };
-		window->updateRegion = window->e.bounds;
-		painter.bits = window->bits;
-		painter.width = window->width;
-		painter.height = window->height;
-		painter.clip = UI_RECT_2S(window->width, window->height);
-
-		for (int i = 0; i < window->width * window->height; i++) {
-			window->bits[i] = 0xFF00FF;
-		}
-
-		_UIElementPaint(&window->e, &painter);
-		painter.clip = UI_RECT_2S(window->width, window->height);
-
-		if (element) {
-			UIDrawInvert(&painter, element->bounds);
-			UIDrawInvert(&painter, UIRectangleAdd(element->bounds, UI_RECT_1I(4)));
-		}
-
-		_UIWindowEndPaint(window, &painter);
-	}
-
-	return 0;
-}
-
-void _UIInspectorCreate() {
-	ui.inspector = UIWindowCreate(0, UI_WINDOW_INSPECTOR, "Inspector", 0, 0);
-	UISplitPane *splitPane = UISplitPaneCreate(&ui.inspector->e, 0, 0.5f);
-	ui.inspectorTable = UITableCreate(&splitPane->e, 0, "Class\tBounds\tID");
-	ui.inspectorTable->e.messageUser = _UIInspectorTableMessage;
-	ui.inspectorLog = UICodeCreate(&splitPane->e, 0);
-}
-
-int _UIInspectorCountElements(UIElement *element) {
-	UIElement *child = element->children;
-	int count = 1;
-
-	while (child) {
-		if (!(child->flags & (UI_ELEMENT_DESTROY | UI_ELEMENT_HIDE))) {
-			count += _UIInspectorCountElements(child);
-		}
-
-		child = child->next;
-	}
-
-	return count;
-}
-
-void _UIInspectorRefresh() {
-	if (!ui.inspectorTarget || !ui.inspector || !ui.inspectorTable) return;
-	ui.inspectorTable->itemCount = _UIInspectorCountElements(&ui.inspectorTarget->e);
-	UITableResizeColumns(ui.inspectorTable);
-	UIElementRefresh(&ui.inspectorTable->e);
-}
-
-void _UIInspectorSetFocusedWindow(UIWindow *window) {
-	if (!ui.inspector || !ui.inspectorTable) return;
-
-	if (window->e.flags & UI_WINDOW_INSPECTOR) {
-		return;
-	}
-
-	if (ui.inspectorTarget != window) {
-		ui.inspectorTarget = window;
-		_UIInspectorRefresh();
-	}
-}
-
-#else
-
-void _UIInspectorCreate() {}
-void _UIInspectorSetFocusedWindow(UIWindow *window) {}
-void _UIInspectorRefresh() {}
-
-#endif
-
-#ifdef UI_AUTOMATION_TESTS
-
-int UIAutomationRunTests();
-
-void UIAutomationProcessMessage() {
-	int result;
-	_UIMessageLoopSingle(&result);
-}
-
-void UIAutomationKeyboardTypeSingle(intptr_t code, bool ctrl, bool shift, bool alt) {
-	UIWindow *window = ui.windows; // TODO Get the focused window.
-	UIKeyTyped m = { 0 };
-	m.code = code;
-	window->ctrl = ctrl;
-	window->alt = alt;
-	window->shift = shift;
-	_UIWindowInputEvent(window, UI_MSG_KEY_TYPED, 0, &m);
-	window->ctrl = false;
-	window->alt = false;
-	window->shift = false;
-}
-
-void UIAutomationKeyboardType(const char *string) {
-	UIWindow *window = ui.windows; // TODO Get the focused window.
-
-	UIKeyTyped m = { 0 };
-	char c[2];
-	m.text = c;
-	m.textBytes = 1;
-	c[1] = 0;
-
-	for (int i = 0; string[i]; i++) {
-		window->ctrl = false;
-		window->alt = false;
-		window->shift = (c[0] >= 'A' && c[0] <= 'Z');
-		c[0] = string[i];
-		m.code = (c[0] >= 'A' && c[0] <= 'Z') ? UI_KEYCODE_LETTER(c[0]) 
-			: c[0] == '\n' ? UI_KEYCODE_ENTER 
-			: c[0] == '\t' ? UI_KEYCODE_TAB 
-			: c[0] == ' ' ? UI_KEYCODE_SPACE 
-			: (c[0] >= '0' && c[0] <= '9') ? UI_KEYCODE_DIGIT(c[0]) : 0;
-		_UIWindowInputEvent(window, UI_MSG_KEY_TYPED, 0, &m);
-	}
-
-	window->ctrl = false;
-	window->alt = false;
-	window->shift = false;
-}
-
-bool UIAutomationCheckCodeLineMatches(UICode *code, int lineIndex, const char *input) {
-	if (lineIndex < 1 || lineIndex > code->lineCount) return false;
-	int bytes = 0;
-	for (int i = 0; input[i]; i++) bytes++;
-	if (bytes != code->lines[lineIndex - 1].bytes) return false;
-	for (int i = 0; input[i]; i++) if (code->content[code->lines[lineIndex - 1].offset + i] != input[i]) return false;
-	return true;
-}
-
-bool UIAutomationCheckTableItemMatches(UITable *table, int row, int column, const char *input) {
-	int bytes = 0;
-	for (int i = 0; input[i]; i++) bytes++;
-	if (row < 0 || row >= table->itemCount) return false;
-	if (column < 0 || column >= table->columnCount) return false;
-	char *buffer = (char *) UI_MALLOC(bytes + 1);
-	UITableGetItem m = { 0 };
-	m.buffer = buffer;
-	m.bufferBytes = bytes + 1;
-	m.column = column;
-	m.index = row;
-	int length = UIElementMessage(&table->e, UI_MSG_TABLE_GET_ITEM, 0, &m);
-	if (length != bytes) return false;
-	for (int i = 0; input[i]; i++) if (buffer[i] != input[i]) return false;
-	return true;
-}
-
-#endif
 
 int UIMessageLoop() {
 	_UIInspectorCreate();

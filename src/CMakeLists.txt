@@ -12,6 +12,8 @@ set(HEADERS
 
 set(SOURCES
   clipboard.c
+  debug.c
+  font.c
   luigi.c
   luigi_private.h
   rect.c

@@ -95,4 +95,11 @@ bool _UIMessageLoopSingle(int *result);
 void _UIInspectorRefresh();
 void _UIUpdate();
 
+const uint8_t *UIFontGetBuiltInData();
+
+// Debugging stuff
+void _UIInspectorCreate();
+void _UIInspectorRefresh();
+void _UIInspectorSetFocusedWindow(UIWindow *window);
+
 #endif // LUIGI_PRIVATE_H
