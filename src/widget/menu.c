@@ -39,6 +39,20 @@ bool _UIMenusClose() {
 	return anyClosed;
 }
 
+bool _UIMenusOpen() {
+	UIWindow *window = ui.windows;
+
+	while (window) {
+		if (window->e.flags & UI_WINDOW_MENU) {
+			return true;
+		}
+
+		window = window->next;
+	}
+
+	return false;
+}
+
 int _UIMenuItemMessage(UIElement *element, UIMessage message, int di, void *dp) {
 	if (message == UI_MSG_CLICKED) {
 		_UIMenusClose();

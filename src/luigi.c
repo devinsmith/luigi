@@ -148,19 +148,6 @@ void _UIProcessAnimations() {
 	}
 }
 
-bool _UIMenusOpen() {
-	UIWindow *window = ui.windows;
-
-	while (window) {
-		if (window->e.flags & UI_WINDOW_MENU) {
-			return true;
-		}
-
-		window = window->next;
-	}
-
-	return false;
-}
 
 void _UIWindowDestroyCommon(UIWindow *window) {
 	UI_FREE(window->bits);

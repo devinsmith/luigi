@@ -105,6 +105,7 @@ void _UIProcessAnimations();
 
 // Menus
 bool _UIMenusClose();
+bool _UIMenusOpen();
 void _UIMenuPrepare(UIMenu *menu, int *width, int *height);
 
 // Fonts
