@@ -95,7 +95,25 @@ bool _UIMessageLoopSingle(int *result);
 void _UIInspectorRefresh();
 void _UIUpdate();
 
+// Platform common
+void _UIWindowDestroyCommon(UIWindow *window);
+int _UIWindowMessageCommon(UIElement *element, UIMessage message, int di, void *dp);
+void _UIWindowAdd(UIWindow *window);
+void _UIInitialiseCommon();
+bool _UIWindowInputEvent(UIWindow *window, UIMessage message, int di, void *dp);
+void _UIProcessAnimations();
+
+// Menus
+bool _UIMenusClose();
+void _UIMenuPrepare(UIMenu *menu, int *width, int *height);
+
+// Fonts
 const uint8_t *UIFontGetBuiltInData();
+
+// Elements
+void _UIElementPaint(UIElement *element, UIPainter *painter);
+UIElement *_UIElementLastChild(UIElement *element);
+UIElement *_UIElementPreviousSibling(UIElement *element);
 
 // Debugging stuff
 void _UIInspectorCreate();

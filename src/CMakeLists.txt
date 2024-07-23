@@ -13,13 +13,18 @@ set(HEADERS
 set(SOURCES
   clipboard.c
   debug.c
+  element.c
   font.c
   luigi.c
   luigi_private.h
+  paint.c
   rect.c
   string.c
   utils.c
   themes.c
+
+  plat/win32.c
+  plat/x11.c
 
   widget/button.c
   widget/code.c
@@ -30,6 +35,7 @@ set(SOURCES
   widget/imagedisplay.c
   widget/label.c
   widget/mdi.c
+  widget/menu.c
   widget/panel.c
   widget/scrollbar.c
   widget/slider.c
