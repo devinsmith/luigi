@@ -246,292 +246,300 @@ void UIWindowPack(UIWindow *window, int _width) {
 	XResizeWindow(ui.display, window->window, width, height);
 }
 
-bool _UIProcessEvent(XEvent *event) {
-	if (event->type == ClientMessage && (Atom) event->xclient.data.l[0] == ui.windowClosedID) {
-		UIWindow *window = X11FindWindow(event->xclient.window);
-		if (!window) return false;
-		bool exit = !UIElementMessage(&window->e, UI_MSG_WINDOW_CLOSE, 0, 0);
-		if (exit) return true;
-		_UIUpdate();
-		return false;
-	} else if (event->type == Expose) {
-		UIWindow *window = X11FindWindow(event->xexpose.window);
-		if (!window) return false;
-		XPutImage(ui.display, window->window, DefaultGC(ui.display, 0), window->image, 0, 0, 0, 0, window->width, window->height);
-	} else if (event->type == ConfigureNotify) {
-		UIWindow *window = X11FindWindow(event->xconfigure.window);
-		if (!window) return false;
+// Process a raw XEvent.
+// Returns true if processed, false otherwise.
+static bool _UIProcessEvent(XEvent *event)
+{
+  // Request to close the window.
+  if (event->type == ClientMessage &&
+      (Atom)event->xclient.data.l[0] == ui.windowClosedID) {
+    UIWindow *window = X11FindWindow(event->xclient.window);
+    if (!window) return false;
 
-		if (window->width != event->xconfigure.width || window->height != event->xconfigure.height) {
-			window->width = event->xconfigure.width;
-			window->height = event->xconfigure.height;
-			window->bits = (uint32_t *) UI_REALLOC(window->bits, window->width * window->height * 4);
-			window->image->width = window->width;
-			window->image->height = window->height;
-			window->image->bytes_per_line = window->width * 4;
-			window->image->data = (char *) window->bits;
-			window->e.bounds = UI_RECT_2S(window->width, window->height);
-			window->e.clip = UI_RECT_2S(window->width, window->height);
+    // Give the element a chance to respond.
+    bool exit = !UIElementMessage(&window->e, UI_MSG_WINDOW_CLOSE, 0, 0);
+    if (exit) return true;
+
+    _UIUpdate();
+    return false;
+  } else if (event->type == Expose) {
+    UIWindow *window = X11FindWindow(event->xexpose.window);
+    if (!window) return false;
+    XPutImage(ui.display, window->window, DefaultGC(ui.display, 0), window->image, 0, 0, 0, 0, window->width, window->height);
+  } else if (event->type == ConfigureNotify) {
+    UIWindow *window = X11FindWindow(event->xconfigure.window);
+    if (!window) return false;
+
+    if (window->width != event->xconfigure.width || window->height != event->xconfigure.height) {
+      window->width = event->xconfigure.width;
+      window->height = event->xconfigure.height;
+      window->bits = (uint32_t *) UI_REALLOC(window->bits, window->width * window->height * 4);
+      window->image->width = window->width;
+      window->image->height = window->height;
+      window->image->bytes_per_line = window->width * 4;
+      window->image->data = (char *) window->bits;
+      window->e.bounds = UI_RECT_2S(window->width, window->height);
+      window->e.clip = UI_RECT_2S(window->width, window->height);
 #ifdef UI_DEBUG
-			for (int i = 0; i < window->width * window->height; i++) window->bits[i] = 0xFF00FF;
+      for (int i = 0; i < window->width * window->height; i++) window->bits[i] = 0xFF00FF;
 #endif
-			UIElementMessage(&window->e, UI_MSG_LAYOUT, 0, 0);
-			_UIUpdate();
-		}
-	} else if (event->type == MotionNotify) {
-		UIWindow *window = X11FindWindow(event->xmotion.window);
-		if (!window) return false;
-		window->cursorX = event->xmotion.x;
-		window->cursorY = event->xmotion.y;
-		_UIWindowInputEvent(window, UI_MSG_MOUSE_MOVE, 0, 0);
-	} else if (event->type == LeaveNotify) {
-		UIWindow *window = X11FindWindow(event->xcrossing.window);
-		if (!window) return false;
+      UIElementMessage(&window->e, UI_MSG_LAYOUT, 0, 0);
+      _UIUpdate();
+    }
+  } else if (event->type == MotionNotify) {
+    UIWindow *window = X11FindWindow(event->xmotion.window);
+    if (!window) return false;
+    window->cursorX = event->xmotion.x;
+    window->cursorY = event->xmotion.y;
+    _UIWindowInputEvent(window, UI_MSG_MOUSE_MOVE, 0, 0);
+  } else if (event->type == LeaveNotify) {
+    UIWindow *window = X11FindWindow(event->xcrossing.window);
+    if (!window) return false;
 
-		if (!window->pressed) {
-			window->cursorX = -1;
-			window->cursorY = -1;
-		}
+    if (!window->pressed) {
+      window->cursorX = -1;
+      window->cursorY = -1;
+    }
 
-		_UIWindowInputEvent(window, UI_MSG_MOUSE_MOVE, 0, 0);
-	} else if (event->type == ButtonPress || event->type == ButtonRelease) {
-		UIWindow *window = X11FindWindow(event->xbutton.window);
-		if (!window) return false;
-		window->cursorX = event->xbutton.x;
-		window->cursorY = event->xbutton.y;
+    _UIWindowInputEvent(window, UI_MSG_MOUSE_MOVE, 0, 0);
+  } else if (event->type == ButtonPress || event->type == ButtonRelease) {
+    UIWindow *window = X11FindWindow(event->xbutton.window);
+    if (!window) return false;
+    window->cursorX = event->xbutton.x;
+    window->cursorY = event->xbutton.y;
 
-		if (event->xbutton.button >= 1 && event->xbutton.button <= 3) {
-			_UIWindowInputEvent(window, (UIMessage) ((event->type == ButtonPress ? UI_MSG_LEFT_DOWN : UI_MSG_LEFT_UP) 
-				+ event->xbutton.button * 2 - 2), 0, 0);
-		} else if (event->xbutton.button == 4) {
-			_UIWindowInputEvent(window, UI_MSG_MOUSE_WHEEL, -72, 0);
-		} else if (event->xbutton.button == 5) {
-			_UIWindowInputEvent(window, UI_MSG_MOUSE_WHEEL, 72, 0);
-		}
+    if (event->xbutton.button >= 1 && event->xbutton.button <= 3) {
+      _UIWindowInputEvent(window, (UIMessage) ((event->type == ButtonPress ? UI_MSG_LEFT_DOWN : UI_MSG_LEFT_UP) 
+        + event->xbutton.button * 2 - 2), 0, 0);
+    } else if (event->xbutton.button == 4) {
+      _UIWindowInputEvent(window, UI_MSG_MOUSE_WHEEL, -72, 0);
+    } else if (event->xbutton.button == 5) {
+      _UIWindowInputEvent(window, UI_MSG_MOUSE_WHEEL, 72, 0);
+    }
 
-		_UIInspectorSetFocusedWindow(window);
-	} else if (event->type == KeyPress) {
-		UIWindow *window = X11FindWindow(event->xkey.window);
-		if (!window) return false;
+    _UIInspectorSetFocusedWindow(window);
+  } else if (event->type == KeyPress) {
+    UIWindow *window = X11FindWindow(event->xkey.window);
+    if (!window) return false;
 
-		if (event->xkey.x == 0x7123 && event->xkey.y == 0x7456) {
-			// HACK! See UIWindowPostMessage.
-			UIElementMessage(&window->e, (UIMessage) event->xkey.state, 0, 
-				(void *) (((uintptr_t) (event->xkey.time & 0xFFFFFFFF) << 32) 
-					| ((uintptr_t) (event->xkey.x_root & 0xFFFF) << 0) 
-					| ((uintptr_t) (event->xkey.y_root & 0xFFFF) << 16)));
-			_UIUpdate();
-		} else {
-			char text[32];
-			KeySym symbol = NoSymbol;
-			Status status;
-			// printf("%ld, %s\n", symbol, text);
-			UIKeyTyped m = { 0 };
-			m.textBytes = Xutf8LookupString(window->xic, &event->xkey, text, sizeof(text) - 1, &symbol, &status); 
-			m.text = text;
-			m.code = XLookupKeysym(&event->xkey, 0);
+    if (event->xkey.x == 0x7123 && event->xkey.y == 0x7456) {
+      // HACK! See UIWindowPostMessage.
+      UIElementMessage(&window->e, (UIMessage) event->xkey.state, 0,
+        (void *) (((uintptr_t) (event->xkey.time & 0xFFFFFFFF) << 32)
+          | ((uintptr_t) (event->xkey.x_root & 0xFFFF) << 0)
+          | ((uintptr_t) (event->xkey.y_root & 0xFFFF) << 16)));
+      _UIUpdate();
+    } else {
+      char text[32];
+      KeySym symbol = NoSymbol;
+      Status status;
+      // printf("%ld, %s\n", symbol, text);
+      UIKeyTyped m = { 0 };
+      m.textBytes = Xutf8LookupString(window->xic, &event->xkey, text, sizeof(text) - 1, &symbol, &status);
+      m.text = text;
+      m.code = XLookupKeysym(&event->xkey, 0);
 
-			if (symbol == XK_Control_L || symbol == XK_Control_R) {
-				window->ctrl = true;
-				window->ctrlCode = event->xkey.keycode;
-				_UIWindowInputEvent(window, UI_MSG_MOUSE_MOVE, 0, 0);
-			} else if (symbol == XK_Shift_L || symbol == XK_Shift_R) {
-				window->shift = true;
-				window->shiftCode = event->xkey.keycode;
-				_UIWindowInputEvent(window, UI_MSG_MOUSE_MOVE, 0, 0);
-			} else if (symbol == XK_Alt_L || symbol == XK_Alt_R) {
-				window->alt = true;
-				window->altCode = event->xkey.keycode;
-				_UIWindowInputEvent(window, UI_MSG_MOUSE_MOVE, 0, 0);
-			} else if (symbol == XK_KP_Left) {
-				m.code = UI_KEYCODE_LEFT;
-			} else if (symbol == XK_KP_Right) {
-				m.code = UI_KEYCODE_RIGHT;
-			} else if (symbol == XK_KP_Up) {
-				m.code = UI_KEYCODE_UP;
-			} else if (symbol == XK_KP_Down) {
-				m.code = UI_KEYCODE_DOWN;
-			} else if (symbol == XK_KP_Home) {
-				m.code = UI_KEYCODE_HOME;
-			} else if (symbol == XK_KP_End) {
-				m.code = UI_KEYCODE_END;
-			} else if (symbol == XK_KP_Enter) {
-				m.code = UI_KEYCODE_ENTER;
-			} else if (symbol == XK_KP_Delete) {
-				m.code = UI_KEYCODE_DELETE;
-			}
+      if (symbol == XK_Control_L || symbol == XK_Control_R) {
+        window->ctrl = true;
+        window->ctrlCode = event->xkey.keycode;
+        _UIWindowInputEvent(window, UI_MSG_MOUSE_MOVE, 0, 0);
+      } else if (symbol == XK_Shift_L || symbol == XK_Shift_R) {
+        window->shift = true;
+        window->shiftCode = event->xkey.keycode;
+        _UIWindowInputEvent(window, UI_MSG_MOUSE_MOVE, 0, 0);
+      } else if (symbol == XK_Alt_L || symbol == XK_Alt_R) {
+        window->alt = true;
+        window->altCode = event->xkey.keycode;
+        _UIWindowInputEvent(window, UI_MSG_MOUSE_MOVE, 0, 0);
+      } else if (symbol == XK_KP_Left) {
+        m.code = UI_KEYCODE_LEFT;
+      } else if (symbol == XK_KP_Right) {
+        m.code = UI_KEYCODE_RIGHT;
+      } else if (symbol == XK_KP_Up) {
+        m.code = UI_KEYCODE_UP;
+      } else if (symbol == XK_KP_Down) {
+        m.code = UI_KEYCODE_DOWN;
+      } else if (symbol == XK_KP_Home) {
+        m.code = UI_KEYCODE_HOME;
+      } else if (symbol == XK_KP_End) {
+        m.code = UI_KEYCODE_END;
+      } else if (symbol == XK_KP_Enter) {
+        m.code = UI_KEYCODE_ENTER;
+      } else if (symbol == XK_KP_Delete) {
+        m.code = UI_KEYCODE_DELETE;
+      }
 
-			_UIWindowInputEvent(window, UI_MSG_KEY_TYPED, 0, &m);
-		}
-	} else if (event->type == KeyRelease) {
-		UIWindow *window = X11FindWindow(event->xkey.window);
-		if (!window) return false;
+      _UIWindowInputEvent(window, UI_MSG_KEY_TYPED, 0, &m);
+    }
+  } else if (event->type == KeyRelease) {
+    UIWindow *window = X11FindWindow(event->xkey.window);
+    if (!window) return false;
 
-		if (event->xkey.keycode == window->ctrlCode) {
-			window->ctrl = false;
-			_UIWindowInputEvent(window, UI_MSG_MOUSE_MOVE, 0, 0);
-		} else if (event->xkey.keycode == window->shiftCode) {
-			window->shift = false;
-			_UIWindowInputEvent(window, UI_MSG_MOUSE_MOVE, 0, 0);
-		} else if (event->xkey.keycode == window->altCode) {
-			window->alt = false;
-			_UIWindowInputEvent(window, UI_MSG_MOUSE_MOVE, 0, 0);
-		}
-	} else if (event->type == FocusIn) {
-		UIWindow *window = X11FindWindow(event->xfocus.window);
-		if (!window) return false;
-		window->ctrl = window->shift = window->alt = false;
-		UIElementMessage(&window->e, UI_MSG_WINDOW_ACTIVATE, 0, 0);
-	} else if (event->type == ClientMessage && event->xclient.message_type == ui.dndEnterID) {
-		UIWindow *window = X11FindWindow(event->xclient.window);
-		if (!window) return false;
-		window->dragSource = (Window) event->xclient.data.l[0];
-	} else if (event->type == ClientMessage && event->xclient.message_type == ui.dndPositionID) {
-		UIWindow *window = X11FindWindow(event->xclient.window);
-		if (!window) return false;
-		XClientMessageEvent m = { 0 };
-		m.type = ClientMessage;
-		m.display = event->xclient.display;
-		m.window = (Window) event->xclient.data.l[0];
-		m.message_type = ui.dndStatusID;
-		m.format = 32;
-		m.data.l[0] = window->window;
-		m.data.l[1] = true;
-		m.data.l[4] = ui.dndActionCopyID;
-		XSendEvent(ui.display, m.window, False, NoEventMask, (XEvent *) &m);
-		XFlush(ui.display);
-	} else if (event->type == ClientMessage && event->xclient.message_type == ui.dndDropID) {
-		UIWindow *window = X11FindWindow(event->xclient.window);
-		if (!window) return false;
+    if (event->xkey.keycode == window->ctrlCode) {
+      window->ctrl = false;
+      _UIWindowInputEvent(window, UI_MSG_MOUSE_MOVE, 0, 0);
+    } else if (event->xkey.keycode == window->shiftCode) {
+      window->shift = false;
+      _UIWindowInputEvent(window, UI_MSG_MOUSE_MOVE, 0, 0);
+    } else if (event->xkey.keycode == window->altCode) {
+      window->alt = false;
+      _UIWindowInputEvent(window, UI_MSG_MOUSE_MOVE, 0, 0);
+    }
+  } else if (event->type == FocusIn) {
+    UIWindow *window = X11FindWindow(event->xfocus.window);
+    if (!window) return false;
+    window->ctrl = window->shift = window->alt = false;
+    UIElementMessage(&window->e, UI_MSG_WINDOW_ACTIVATE, 0, 0);
+  } else if (event->type == ClientMessage && event->xclient.message_type == ui.dndEnterID) {
+    UIWindow *window = X11FindWindow(event->xclient.window);
+    if (!window) return false;
+    window->dragSource = (Window) event->xclient.data.l[0];
+  } else if (event->type == ClientMessage && event->xclient.message_type == ui.dndPositionID) {
+    UIWindow *window = X11FindWindow(event->xclient.window);
+    if (!window) return false;
+    XClientMessageEvent m = { 0 };
+    m.type = ClientMessage;
+    m.display = event->xclient.display;
+    m.window = (Window) event->xclient.data.l[0];
+    m.message_type = ui.dndStatusID;
+    m.format = 32;
+    m.data.l[0] = window->window;
+    m.data.l[1] = true;
+    m.data.l[4] = ui.dndActionCopyID;
+    XSendEvent(ui.display, m.window, False, NoEventMask, (XEvent *) &m);
+    XFlush(ui.display);
+  } else if (event->type == ClientMessage && event->xclient.message_type == ui.dndDropID) {
+    UIWindow *window = X11FindWindow(event->xclient.window);
+    if (!window) return false;
 
-		// TODO Dropping text.
+    // TODO Dropping text.
 
-		if (!XConvertSelection(ui.display, ui.dndSelectionID, ui.uriListID, ui.primaryID, window->window, event->xclient.data.l[2])) {
-			XClientMessageEvent m = { 0 };
-			m.type = ClientMessage;
-			m.display = ui.display;
-			m.window = window->dragSource;
-			m.message_type = ui.dndFinishedID;
-			m.format = 32;
-			m.data.l[0] = window->window;
-			m.data.l[1] = 0;
-			m.data.l[2] = ui.dndActionCopyID;
-			XSendEvent(ui.display, m.window, False, NoEventMask, (XEvent *) &m);
-			XFlush(ui.display);
-		}
-	} else if (event->type == SelectionNotify) {
-		UIWindow *window = X11FindWindow(event->xselection.requestor);
-		if (!window) return false;
-		if (!window->dragSource) return false;
+    if (!XConvertSelection(ui.display, ui.dndSelectionID, ui.uriListID, ui.primaryID, window->window, event->xclient.data.l[2])) {
+      XClientMessageEvent m = { 0 };
+      m.type = ClientMessage;
+      m.display = ui.display;
+      m.window = window->dragSource;
+      m.message_type = ui.dndFinishedID;
+      m.format = 32;
+      m.data.l[0] = window->window;
+      m.data.l[1] = 0;
+      m.data.l[2] = ui.dndActionCopyID;
+      XSendEvent(ui.display, m.window, False, NoEventMask, (XEvent *) &m);
+      XFlush(ui.display);
+    }
+  } else if (event->type == SelectionNotify) {
+    UIWindow *window = X11FindWindow(event->xselection.requestor);
+    if (!window) return false;
+    if (!window->dragSource) return false;
 
-		Atom type = None;
-		int format = 0;
-		uint64_t count = 0, bytesLeft = 0;
-		uint8_t *data = NULL;
-		XGetWindowProperty(ui.display, window->window, ui.primaryID, 0, 65536, False, AnyPropertyType, &type, &format, &count, &bytesLeft, &data);
+    Atom type = None;
+    int format = 0;
+    uint64_t count = 0, bytesLeft = 0;
+    uint8_t *data = NULL;
+    XGetWindowProperty(ui.display, window->window, ui.primaryID, 0, 65536, False, AnyPropertyType, &type, &format, &count, &bytesLeft, &data);
 
-		if (format == 8 /* bits per character */) {
-			if (event->xselection.target == ui.uriListID) {
-				char *copy = (char *) UI_MALLOC(count);
-				int fileCount = 0;
+    if (format == 8 /* bits per character */) {
+      if (event->xselection.target == ui.uriListID) {
+        char *copy = (char *) UI_MALLOC(count);
+        int fileCount = 0;
 
-				for (int i = 0; i < (int) count; i++) {
-					copy[i] = data[i];
+        for (int i = 0; i < (int) count; i++) {
+          copy[i] = data[i];
 
-					if (i && data[i - 1] == '\r' && data[i] == '\n') {
-						fileCount++;
-					}
-				}
+          if (i && data[i - 1] == '\r' && data[i] == '\n') {
+            fileCount++;
+          }
+        }
 
-				char **files = (char **) UI_MALLOC(sizeof(char *) * fileCount);
-				fileCount = 0;
+        char **files = (char **) UI_MALLOC(sizeof(char *) * fileCount);
+        fileCount = 0;
 
-				for (int i = 0; i < (int) count; i++) {
-					char *s = copy + i;
-					while (!(i && data[i - 1] == '\r' && data[i] == '\n' && i < (int) count)) i++;
-					copy[i - 1] = 0;
+        for (int i = 0; i < (int) count; i++) {
+          char *s = copy + i;
+          while (!(i && data[i - 1] == '\r' && data[i] == '\n' && i < (int) count)) i++;
+          copy[i - 1] = 0;
 
-					for (int j = 0; s[j]; j++) {
-						if (s[j] == '%' && s[j + 1] && s[j + 2]) {
-							char n[3];
-							n[0] = s[j + 1], n[1] = s[j + 2], n[2] = 0;
-							s[j] = strtol(n, NULL, 16);
-							if (!s[j]) break;
-							memmove(s + j + 1, s + j + 3, strlen(s) - j - 2);
-						}
-					}
+          for (int j = 0; s[j]; j++) {
+            if (s[j] == '%' && s[j + 1] && s[j + 2]) {
+              char n[3];
+              n[0] = s[j + 1], n[1] = s[j + 2], n[2] = 0;
+              s[j] = strtol(n, NULL, 16);
+              if (!s[j]) break;
+              memmove(s + j + 1, s + j + 3, strlen(s) - j - 2);
+            }
+          }
 
-					if (s[0] == 'f' && s[1] == 'i' && s[2] == 'l' && s[3] == 'e' && s[4] == ':' && s[5] == '/' && s[6] == '/') {
-						files[fileCount++] = s + 7;
-					}
-				}
+          if (s[0] == 'f' && s[1] == 'i' && s[2] == 'l' && s[3] == 'e' && s[4] == ':' && s[5] == '/' && s[6] == '/') {
+            files[fileCount++] = s + 7;
+          }
+        }
 
-				UIElementMessage(&window->e, UI_MSG_WINDOW_DROP_FILES, fileCount, files);
+        UIElementMessage(&window->e, UI_MSG_WINDOW_DROP_FILES, fileCount, files);
 
-				UI_FREE(files);
-				UI_FREE(copy);
-			} else if (event->xselection.target == ui.plainTextID) {
-				// TODO.
-			}
-		}
+        UI_FREE(files);
+        UI_FREE(copy);
+      } else if (event->xselection.target == ui.plainTextID) {
+        // TODO.
+      }
+    }
 
-		XFree(data);
+    XFree(data);
 
-		XClientMessageEvent m = { 0 };
-		m.type = ClientMessage;
-		m.display = ui.display;
-		m.window = window->dragSource;
-		m.message_type = ui.dndFinishedID;
-		m.format = 32;
-		m.data.l[0] = window->window;
-		m.data.l[1] = true;
-		m.data.l[2] = ui.dndActionCopyID;
-		XSendEvent(ui.display, m.window, False, NoEventMask, (XEvent *) &m);
-		XFlush(ui.display);
+    XClientMessageEvent m = { 0 };
+    m.type = ClientMessage;
+    m.display = ui.display;
+    m.window = window->dragSource;
+    m.message_type = ui.dndFinishedID;
+    m.format = 32;
+    m.data.l[0] = window->window;
+    m.data.l[1] = true;
+    m.data.l[2] = ui.dndActionCopyID;
+    XSendEvent(ui.display, m.window, False, NoEventMask, (XEvent *) &m);
+    XFlush(ui.display);
 
-		window->dragSource = 0; // Drag complete.
-		_UIUpdate();
-	} else if (event->type == SelectionRequest) {
-		UIWindow *window = X11FindWindow(event->xclient.window);
-		if (!window) return false;
+    window->dragSource = 0; // Drag complete.
+    _UIUpdate();
+  } else if (event->type == SelectionRequest) {
+    UIWindow *window = X11FindWindow(event->xclient.window);
+    if (!window) return false;
 
-		if ((XGetSelectionOwner(ui.display, ui.clipboardID) == window->window) 
-				&& (event->xselectionrequest.selection == ui.clipboardID)) {
-			XSelectionRequestEvent requestEvent = event->xselectionrequest;
-			Atom utf8ID = XInternAtom(ui.display, "UTF8_STRING", 1);
-			if (utf8ID == None) utf8ID = XA_STRING;
+    if ((XGetSelectionOwner(ui.display, ui.clipboardID) == window->window) 
+        && (event->xselectionrequest.selection == ui.clipboardID)) {
+      XSelectionRequestEvent requestEvent = event->xselectionrequest;
+      Atom utf8ID = XInternAtom(ui.display, "UTF8_STRING", 1);
+      if (utf8ID == None) utf8ID = XA_STRING;
 
-			Atom type = requestEvent.target;
-			type = (type == ui.textID) ? XA_STRING : type;
-			int changePropertyResult = 0;
+      Atom type = requestEvent.target;
+      type = (type == ui.textID) ? XA_STRING : type;
+      int changePropertyResult = 0;
 
-			if(requestEvent.target == XA_STRING || requestEvent.target == ui.textID || requestEvent.target == utf8ID) {
-				changePropertyResult = XChangeProperty(requestEvent.display, requestEvent.requestor, requestEvent.property, 
-						type, 8, PropModeReplace, (const unsigned char *) ui.pasteText, strlen(ui.pasteText));
-			} else if (requestEvent.target == ui.targetID) {
-				changePropertyResult = XChangeProperty(requestEvent.display, requestEvent.requestor, requestEvent.property, 
-						XA_ATOM, 32, PropModeReplace, (unsigned char *) &utf8ID, 1);
-			}
+      if(requestEvent.target == XA_STRING || requestEvent.target == ui.textID || requestEvent.target == utf8ID) {
+        changePropertyResult = XChangeProperty(requestEvent.display, requestEvent.requestor, requestEvent.property, 
+            type, 8, PropModeReplace, (const unsigned char *) ui.pasteText, strlen(ui.pasteText));
+      } else if (requestEvent.target == ui.targetID) {
+        changePropertyResult = XChangeProperty(requestEvent.display, requestEvent.requestor, requestEvent.property, 
+            XA_ATOM, 32, PropModeReplace, (unsigned char *) &utf8ID, 1);
+      }
 
-			if(changePropertyResult == 0 || changePropertyResult == 1) {
-				XSelectionEvent sendEvent = {
-					.type = SelectionNotify,
-					.serial = requestEvent.serial,
-					.send_event = requestEvent.send_event,
-					.display = requestEvent.display,
-					.requestor = requestEvent.requestor,
-					.selection = requestEvent.selection,
-					.target = requestEvent.target,
-					.property = requestEvent.property,
-					.time = requestEvent.time
-				};
+      if(changePropertyResult == 0 || changePropertyResult == 1) {
+        XSelectionEvent sendEvent = {
+          .type = SelectionNotify,
+          .serial = requestEvent.serial,
+          .send_event = requestEvent.send_event,
+          .display = requestEvent.display,
+          .requestor = requestEvent.requestor,
+          .selection = requestEvent.selection,
+          .target = requestEvent.target,
+          .property = requestEvent.property,
+          .time = requestEvent.time
+        };
 
-				XSendEvent(ui.display, requestEvent.requestor, 0, 0, (XEvent *) &sendEvent);
-			}
-		}
-	}
+        XSendEvent(ui.display, requestEvent.requestor, 0, 0, (XEvent *) &sendEvent);
+      }
+    }
+  }
 
-	return false;
+  return false;
 }
 
 bool _UIMessageLoopSingle(int *result) {
